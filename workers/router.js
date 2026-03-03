@@ -13,11 +13,15 @@ export default {
       return env.STRIPE_SERVICE.fetch(request);
     }
 
+    if (host.startsWith('gateway.')) {
+      return env.GATEWAY_SERVICE.fetch(request);
+    }
+
     return Response.json({ 
       status: 'BlackRoad Edge Router',
       host,
       path: url.pathname,
-      routes: ['stripe.*', 'brand.*', 'api.*']
+      routes: ['stripe.*', 'gateway.*']
     });
   }
 };
