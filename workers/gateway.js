@@ -19,13 +19,20 @@ export default {
       return Response.json({ error: `Unknown provider: ${provider}` }, { status: 400 });
     }
 
-    // Forward to backend
-    const targetUrl = `${backend}${url.pathname}${url.search}`;
+    // Build forwarded URL — strip internal 'provider' param before sending upstream
+    const forwardParams = new URLSearchParams(url.search);
+    forwardParams.delete('provider');
+    const queryStr = forwardParams.toString() ? `?${forwardParams.toString()}` : '';
+    const targetUrl = `${backend}${url.pathname}${queryStr}`;
+
+    // Copy headers, remove hop-by-hop / internal headers
     const headers = new Headers(request.headers);
-    
+    headers.delete('host');
+
     // Inject auth for cloud providers
     if (provider === 'claude' && env.ANTHROPIC_API_KEY) {
       headers.set('x-api-key', env.ANTHROPIC_API_KEY);
+      headers.set('anthropic-version', '2023-06-01');
     } else if (provider === 'openai' && env.OPENAI_API_KEY) {
       headers.set('Authorization', `Bearer ${env.OPENAI_API_KEY}`);
     }
