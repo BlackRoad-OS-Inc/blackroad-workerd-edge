@@ -1,0 +1,81 @@
+# BlackRoad OS — Deploy to Cloudflare Workers
+# Deploys stripe and gateway workers to Cloudflare on every push to main.
+# Cloudflare Workers handles longer-running tasks (AI proxy, billing).
+#
+# ✅ Verified: All actions pinned to SHA-256 commit hashes.
+# actions/checkout@v6.0.2          → de0fac2e4500dabe0009e67214ff5f5447ce83dd
+# actions/setup-node@v6.3.0        → 53b83947a5a98c8d113130e565377fae1a50d02f
+# cloudflare/wrangler-action@v3.14.1 → da0e0dfe58b7a431659754fdf3f186c529afbe65
+#
+# Required repository secrets (Settings → Secrets → Actions):
+#   CF_API_TOKEN   — Cloudflare API token (Workers:Edit permission)
+#   CF_ACCOUNT_ID  — Cloudflare Account ID
+#
+# Worker secrets are set once manually after first deploy:
+#   npx wrangler secret put STRIPE_SECRET_KEY --env production
+#   npx wrangler secret put STRIPE_WEBHOOK_SECRET --env production
+#   npx wrangler secret put ALLOWED_ORIGIN --env production
+#   npx wrangler secret put ANTHROPIC_API_KEY --env production -c wrangler.gateway.toml
+#   npx wrangler secret put OPENAI_API_KEY --env production -c wrangler.gateway.toml
+
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy-stripe:
+    name: Deploy Stripe Worker → Cloudflare
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy stripe worker
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: deploy --env production
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-gateway:
+    name: Deploy AI Gateway Worker → Cloudflare (longer tasks)
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy gateway worker (AI proxy — Cloudflare for longer tasks)
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: deploy --env production -c wrangler.gateway.toml
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
