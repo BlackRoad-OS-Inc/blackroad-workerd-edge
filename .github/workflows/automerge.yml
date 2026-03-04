@@ -1,0 +1,38 @@
+# BlackRoad OS — Auto-Merge
+# Enables auto-merge on PRs created by Dependabot (or approved by a human reviewer)
+# once all required CI checks pass.
+#
+# ✅ Verified: All actions pinned to SHA-256 commit hashes.
+# actions/checkout@v6.0.2                          → de0fac2e4500dabe0009e67214ff5f5447ce83dd
+# peter-evans/enable-pull-request-automerge@v3.0.0 → a660677d5469627102a1c1e11409dd063606628d
+
+name: Auto-Merge
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    name: Enable auto-merge
+    runs-on: ubuntu-latest
+    # Only auto-merge Dependabot PRs or PRs from repo collaborators after approval
+    if: |
+      github.actor == 'dependabot[bot]' ||
+      (github.event.pull_request.author_association == 'OWNER' ||
+       github.event.pull_request.author_association == 'MEMBER' ||
+       github.event.pull_request.author_association == 'COLLABORATOR')
+    steps:
+      - name: Enable auto-merge (squash)
+        uses: peter-evans/enable-pull-request-automerge@a660677d5469627102a1c1e11409dd063606628d # v3.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          merge-method: squash

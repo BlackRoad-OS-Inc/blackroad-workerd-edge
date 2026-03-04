@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Wrangler local state
+.wrangler/
+
+# Build output
+dist/
+
+# Local secrets (never commit these)
+.dev.vars
+*.env
+secrets.capnp
+.env.local
+.env.production.local
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.swp

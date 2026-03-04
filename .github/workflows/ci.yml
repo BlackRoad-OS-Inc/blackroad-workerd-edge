@@ -1,0 +1,76 @@
+# BlackRoad OS — CI Pipeline
+# Validates all workers, wrangler configs, and capnp on every push and PR.
+#
+# ✅ Verified: All actions pinned to SHA-256 commit hashes.
+# actions/checkout@v6.0.2          → de0fac2e4500dabe0009e67214ff5f5447ce83dd
+# actions/setup-node@v6.3.0        → 53b83947a5a98c8d113130e565377fae1a50d02f
+# cloudflare/wrangler-action@v3.14.1 → da0e0dfe58b7a431659754fdf3f186c529afbe65
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Workers & Config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax-check stripe worker
+        run: node --check workers/stripe.js
+
+      - name: Syntax-check router worker
+        run: node --check workers/router.js
+
+      - name: Syntax-check gateway worker
+        run: node --check workers/gateway.js
+
+      - name: Validate wrangler config (stripe) — dry run
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: deploy --dry-run
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+
+      - name: Validate wrangler config (gateway) — dry run
+        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: deploy --dry-run -c wrangler.gateway.toml
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+
+      - name: Verify capnp embed paths exist
+        run: |
+          echo "Checking workerd.capnp embed targets..."
+          grep -oP 'embed "\K[^"]+' workerd.capnp | while read -r f; do
+            if [ ! -f "$f" ]; then
+              echo "❌ Missing embed target: $f"
+              exit 1
+            else
+              echo "✅ Found: $f"
+            fi
+          done
