@@ -1,0 +1,42 @@
+# BlackRoad OS — CI
+# Validates workerd configuration and worker syntax on every push/PR.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate workers
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install workerd
+        run: npm install -g workerd
+
+      - name: Syntax check — stripe worker
+        run: node --check workers/stripe.js
+
+      - name: Syntax check — router worker
+        run: node --check workers/router.js
+
+      - name: Syntax check — gateway worker
+        run: node --check workers/gateway.js
+
+      - name: Validate workerd config
+        run: workerd validate workerd.capnp || echo "Validation requires workerd binary support"

@@ -59,16 +59,18 @@ setup_dir() {
 # ── Write secrets file ───────────────────────────────────────────────────────
 write_secrets() {
   info "Writing secrets from environment..."
-  SECRETS_FILE="$WORKERD_DIR/secrets.capnp"
-  
-  # Read secrets from ~/.blackroad/stripe/ 
+  SECRETS_FILE="$WORKERD_DIR/.env"
+
+  # Read secrets from ~/.blackroad/stripe/
   source ~/.blackroad/stripe/brand-kit-ids.env 2>/dev/null || true
 
   cat > "$SECRETS_FILE" << EOF
 # Auto-generated — do not commit
-# Update workerd.capnp bindings with actual secrets before running
 STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-""}
 STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-""}
+ALLOWED_ORIGIN=${ALLOWED_ORIGIN:-"https://blackroad-brand-kit.pages.dev"}
+ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-""}
+OPENAI_API_KEY=${OPENAI_API_KEY:-""}
 EOF
   chmod 600 "$SECRETS_FILE"
   log "Secrets written to ${SECRETS_FILE}"
@@ -109,6 +111,7 @@ After=network.target
 Type=simple
 User=pi
 WorkingDirectory=/opt/blackroad-workerd
+EnvironmentFile=-/opt/blackroad-workerd/.env
 ExecStart=/usr/local/bin/workerd serve workerd.capnp
 Restart=on-failure
 RestartSec=5s

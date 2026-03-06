@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+.env
+*.env
+secrets.capnp
+.wrangler/
+dist/
+.DS_Store
+*.log
