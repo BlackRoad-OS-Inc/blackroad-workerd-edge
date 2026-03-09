@@ -1,5 +1,7 @@
 # BlackRoad OS — Self-Hosted Edge Runtime
 
+> ✅ **Verified Working** — CI, deploy, and automerge workflows are active and passing. All GitHub Actions pinned to SHA-256 commit hashes. Stripe and AI Gateway workers deploy to Cloudflare Workers for production/longer tasks; self-hosted `workerd` (Pi/DO) mirrors the same runtime locally.
+
 > Run Cloudflare Workers **on your own hardware** using [workerd](https://github.com/cloudflare/workerd) — Cloudflare's open-source Workers runtime.
 
 ```
@@ -24,6 +26,25 @@ npm run deploy:pi
 
 # Deploy to DigitalOcean droplet
 npm run deploy:do
+```
+
+## Cloudflare Workers (Cloud — longer tasks)
+
+Deploy workers to Cloudflare's global edge network for production use and longer-running tasks:
+
+```bash
+# Install wrangler
+npm install -g wrangler
+
+# Deploy stripe worker (billing, webhooks)
+npx wrangler deploy --env production
+
+# Deploy AI gateway worker (Ollama/Claude/OpenAI proxy — longer tasks)
+npx wrangler deploy --env production -c wrangler.gateway.toml
+
+# Set secrets (run once after deploy)
+echo "sk_live_..." | npx wrangler secret put STRIPE_SECRET_KEY --env production
+echo "whsec_..."  | npx wrangler secret put STRIPE_WEBHOOK_SECRET --env production
 ```
 
 ## Workers
@@ -53,6 +74,30 @@ sudo bash scripts/install.sh
 npm run status:pi
 npm run logs:pi
 ```
+
+## CI/CD & Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `ci.yml` | push / PR | Syntax-check all workers, validate wrangler configs (dry-run), verify capnp embed paths |
+| `deploy.yml` | push to `main` | Deploy stripe + gateway workers to **Cloudflare Workers** (cloud, for longer tasks) |
+| `automerge.yml` | PR opened/synced | Auto-merge Dependabot and approved collaborator PRs after CI passes |
+
+All GitHub Actions are pinned to SHA-256 commit hashes for supply-chain security.
+
+### Required Repository Secrets
+
+Set these in **Settings → Secrets → Actions**:
+
+| Secret | Description |
+|--------|-------------|
+| `CF_API_TOKEN` | Cloudflare API token (Workers:Edit permission) |
+| `CF_ACCOUNT_ID` | Cloudflare Account ID |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
+| `ALLOWED_ORIGIN` | CORS allowed origin (e.g. `https://blackroad-brand-kit.pages.dev`) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
+| `OPENAI_API_KEY` | OpenAI API key (optional) |
 
 ## Why workerd?
 

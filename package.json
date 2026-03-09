@@ -6,6 +6,9 @@
     "dev":     "workerd serve workerd.capnp",
     "start":   "workerd serve workerd.capnp",
     "install-workerd": "npm install -g workerd",
+    "deploy:stripe":   "wrangler deploy --env production",
+    "deploy:gateway":  "wrangler deploy --env production -c wrangler.gateway.toml",
+    "deploy:cf":       "npm run deploy:stripe && npm run deploy:gateway",
     "deploy:pi":       "rsync -avz --exclude node_modules . pi@192.168.4.64:/opt/blackroad-workerd/ && ssh pi@192.168.4.64 'sudo systemctl restart blackroad-workerd'",
     "deploy:do":       "rsync -avz --exclude node_modules . root@159.65.43.12:/opt/blackroad-workerd/ && ssh root@159.65.43.12 'systemctl restart blackroad-workerd'",
     "deploy:both":     "npm run deploy:pi && npm run deploy:do",
@@ -15,6 +18,7 @@
     "logs:do":         "ssh root@159.65.43.12 'journalctl -u blackroad-workerd -f'"
   },
   "devDependencies": {
-    "workerd": "^1.20260302.0"
+    "workerd": "^1.20260302.0",
+    "wrangler": "^4.70.0"
   }
 }
