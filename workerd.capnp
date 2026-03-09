@@ -24,6 +24,11 @@ const stripeWorker :Workerd.Worker = (
   ],
   compatibilityDate = "2024-12-01",
   globalOutbound = "internet",
+  bindings = [
+    ( name = "STRIPE_SECRET_KEY",     fromEnvironment = "STRIPE_SECRET_KEY" ),
+    ( name = "STRIPE_WEBHOOK_SECRET", fromEnvironment = "STRIPE_WEBHOOK_SECRET" ),
+    ( name = "ALLOWED_ORIGIN",        fromEnvironment = "ALLOWED_ORIGIN" ),
+  ],
 );
 
 const routerWorker :Workerd.Worker = (
@@ -32,6 +37,10 @@ const routerWorker :Workerd.Worker = (
   ],
   compatibilityDate = "2024-12-01",
   globalOutbound = "internet",
+  bindings = [
+    ( name = "STRIPE_SERVICE",  service = "stripe" ),
+    ( name = "GATEWAY_SERVICE", service = "gateway" ),
+  ],
 );
 
 const gatewayWorker :Workerd.Worker = (
@@ -41,4 +50,8 @@ const gatewayWorker :Workerd.Worker = (
   compatibilityDate = "2024-12-01",
   compatibilityFlags = ["nodejs_compat"],
   globalOutbound = "internet",
+  bindings = [
+    ( name = "ANTHROPIC_API_KEY", fromEnvironment = "ANTHROPIC_API_KEY" ),
+    ( name = "OPENAI_API_KEY",    fromEnvironment = "OPENAI_API_KEY" ),
+  ],
 );
