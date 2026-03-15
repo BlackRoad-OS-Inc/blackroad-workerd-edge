@@ -1,121 +1,41 @@
-# BlackRoad OS — Self-Hosted Edge Runtime
+<div align="center">
 
-> ✅ **Verified Working** — CI, deploy, and automerge workflows are active and passing. All GitHub Actions pinned to SHA-256 commit hashes. Stripe and AI Gateway workers deploy to Cloudflare Workers for production/longer tasks; self-hosted `workerd` (Pi/DO) mirrors the same runtime locally.
+<img src="https://images.blackroad.io/pixel-art/road-logo.png" alt="BlackRoad OS" width="80" />
 
-> Run Cloudflare Workers **on your own hardware** using [workerd](https://github.com/cloudflare/workerd) — Cloudflare's open-source Workers runtime.
+# blackroad-workerd-edge
 
-```
-Pi / DigitalOcean
-├── workerd (port 8081) → stripe worker
-├── workerd (port 8082) → router worker  
-├── workerd (port 8083) → AI gateway worker
-└── Caddy → TLS termination → workerd ports
-```
+**Self-hosted Cloudflare Workers runtime — run Workers on Pi/DO with workerd**
 
-## Quick Start
+[![BlackRoad OS](https://img.shields.io/badge/BlackRoad_OS-Pave_Tomorrow-FF2255?style=for-the-badge&labelColor=000000)](https://blackroad.io)
+[![License](https://img.shields.io/badge/License-Proprietary-FF6B2B?style=for-the-badge&labelColor=000000)](./LICENSE)
+[![Edge AI](https://img.shields.io/badge/Edge_AI-52_TOPS-00D4FF?style=for-the-badge&labelColor=000000)](https://github.com/BlackRoad-OS-Inc)
 
-```bash
-# Install workerd globally
-npm install -g workerd
+</div>
 
-# Run locally (dev)
-npm run dev
+<div align="center">
+<sub>Part of the <a href="https://blackroad.io">BlackRoad OS</a> ecosystem — sovereign edge AI infrastructure</sub>
+</div>
 
-# Deploy to Pi
-npm run deploy:pi
+---
 
-# Deploy to DigitalOcean droplet
-npm run deploy:do
-```
+## Overview
 
-## Cloudflare Workers (Cloud — longer tasks)
+Self-hosted Cloudflare Workers runtime — run Workers on Pi/DO with workerd
 
-Deploy workers to Cloudflare's global edge network for production use and longer-running tasks:
+## License
 
-```bash
-# Install wrangler
-npm install -g wrangler
+**Proprietary** — Copyright © 2024–2026 [BlackRoad OS, Inc.](https://blackroad.io) All rights reserved.
 
-# Deploy stripe worker (billing, webhooks)
-npx wrangler deploy --env production
+Founder & CEO: **Alexa Louise Amundson** · Delaware C-Corp
 
-# Deploy AI gateway worker (Ollama/Claude/OpenAI proxy — longer tasks)
-npx wrangler deploy --env production -c wrangler.gateway.toml
+See [LICENSE](./LICENSE) for full terms.
 
-# Set secrets (run once after deploy)
-echo "sk_live_..." | npx wrangler secret put STRIPE_SECRET_KEY --env production
-echo "whsec_..."  | npx wrangler secret put STRIPE_WEBHOOK_SECRET --env production
-```
+---
 
-## Workers
+<div align="center">
 
-| Worker | Port | Routes |
-|--------|------|--------|
-| `stripe` | 8081 | `/checkout`, `/portal`, `/webhook`, `/prices`, `/health` |
-| `router` | 8082 | Routes by subdomain to service workers |
-| `gateway` | 8083 | Proxies to Ollama / Claude / OpenAI |
+**BlackRoad OS — Pave Tomorrow.**
 
-## Secrets
+[blackroad.io](https://blackroad.io) · [GitHub](https://github.com/BlackRoad-OS-Inc) · [Brand](https://brand.blackroad.io)
 
-Before running, set secrets in `workerd.capnp` bindings or export env vars:
-
-```bash
-export STRIPE_SECRET_KEY="sk_live_..."
-export STRIPE_WEBHOOK_SECRET="whsec_..."
-```
-
-## Production (systemd)
-
-```bash
-# Install as systemd service (requires root)
-sudo bash scripts/install.sh
-
-# Check status
-npm run status:pi
-npm run logs:pi
-```
-
-## CI/CD & Workflows
-
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci.yml` | push / PR | Syntax-check all workers, validate wrangler configs (dry-run), verify capnp embed paths |
-| `deploy.yml` | push to `main` | Deploy stripe + gateway workers to **Cloudflare Workers** (cloud, for longer tasks) |
-| `automerge.yml` | PR opened/synced | Auto-merge Dependabot and approved collaborator PRs after CI passes |
-
-All GitHub Actions are pinned to SHA-256 commit hashes for supply-chain security.
-
-### Required Repository Secrets
-
-Set these in **Settings → Secrets → Actions**:
-
-| Secret | Description |
-|--------|-------------|
-| `CF_API_TOKEN` | Cloudflare API token (Workers:Edit permission) |
-| `CF_ACCOUNT_ID` | Cloudflare Account ID |
-| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_live_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
-| `ALLOWED_ORIGIN` | CORS allowed origin (e.g. `https://blackroad-brand-kit.pages.dev`) |
-| `ANTHROPIC_API_KEY` | Anthropic API key (optional) |
-| `OPENAI_API_KEY` | OpenAI API key (optional) |
-
-## Why workerd?
-
-- **Zero CF billing** — run Workers code on your own infra
-- **Same runtime** — identical V8 isolates, same APIs as Cloudflare
-- **Local AI** — gateway worker proxies to Ollama on the same machine
-- **No cold starts** — persistent process, instant response
-- **ARM64 support** — runs on Raspberry Pi 4/5
-
-## Architecture
-
-```
-Internet
-    │
-    ▼
-Caddy (auto-TLS via Let's Encrypt)
-    │
-    ├── stripe.blackroad.io → workerd:8081 (stripe worker)
-    ├── gateway.blackroad.io → workerd:8083 (AI gateway)
-    └── *.internal → Tailscale mesh
-```
+</div>
