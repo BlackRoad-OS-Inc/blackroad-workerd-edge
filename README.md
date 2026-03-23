@@ -1,41 +1,20 @@
-<div align="center">
-
-<img src="https://images.blackroad.io/pixel-art/road-logo.png" alt="BlackRoad OS" width="80" />
-
 # blackroad-workerd-edge
 
-**Self-hosted Cloudflare Workers runtime — run Workers on Pi/DO with workerd**
+BlackRoad Workerd Edge — self-hosted Cloudflare Workers runtime on Raspberry Pi and DigitalOcean
 
-[![BlackRoad OS](https://img.shields.io/badge/BlackRoad_OS-Pave_Tomorrow-FF2255?style=for-the-badge&labelColor=000000)](https://blackroad.io)
-[![License](https://img.shields.io/badge/License-Proprietary-FF6B2B?style=for-the-badge&labelColor=000000)](./LICENSE)
-[![Edge AI](https://img.shields.io/badge/Edge_AI-52_TOPS-00D4FF?style=for-the-badge&labelColor=000000)](https://github.com/BlackRoad-OS-Inc)
+## Organization
 
-</div>
+**BlackRoad-OS-Inc** — Corporate root — all IP, strategy, and governance
 
-<div align="center">
-<sub>Part of the <a href="https://blackroad.io">BlackRoad OS</a> ecosystem — sovereign edge AI infrastructure</sub>
-</div>
+## BlackRoad OS
 
----
+BlackRoad OS is a distributed AI operating system — 20 domains, 668 repositories, 1,000 AI agents, and sovereign infrastructure running on Raspberry Pis and Hailo-8 accelerators. No cloud dependency.
 
-## Overview
+- [blackroad.io](https://blackroad.io) — Main platform
+- [docs.blackroad.io](https://docs.blackroad.io) — Documentation
+- [GitHub](https://github.com/BlackRoad-OS-Inc) — This organization
 
-Self-hosted Cloudflare Workers runtime — run Workers on Pi/DO with workerd
+**Language:** JavaScript
 
-## License
 
-**Proprietary** — Copyright © 2024–2026 [BlackRoad OS, Inc.](https://blackroad.io) All rights reserved.
-
-Founder & CEO: **Alexa Louise Amundson** · Delaware C-Corp
-
-See [LICENSE](./LICENSE) for full terms.
-
----
-
-<div align="center">
-
-**BlackRoad OS — Pave Tomorrow.**
-
-[blackroad.io](https://blackroad.io) · [GitHub](https://github.com/BlackRoad-OS-Inc) · [Brand](https://brand.blackroad.io)
-
-</div>
+*© 2024-2026 BlackRoad OS, Inc. All Rights Reserved.*
