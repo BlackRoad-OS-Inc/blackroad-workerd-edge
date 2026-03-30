@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "workerd": "^1.20260316.1",
-    "wrangler": "^4.76.0"
+    "wrangler": "^4.78.0"
   }
 }
